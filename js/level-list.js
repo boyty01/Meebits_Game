@@ -142,6 +142,7 @@ playBtn.addEventListener('click', () => {
 
           // Store sprite URL if provided
           const spriteID = spriteInput.value? spriteInput.value.trim() : "17600";
+          console.log(spriteID);
           if (spriteID) sessionStorage.setItem('playerSprite', `https://files.meebits.app/sprites/${spriteID}.png`);
 
           window.location.href = 'play.html';
@@ -162,7 +163,7 @@ playBtn.addEventListener('click', () => {
           sessionStorage.setItem('levelFileName', 'Default Level');
 
           // Store sprite URL if provided
-          const spriteID = spriteInput.value.trim();
+         const spriteID = spriteInput.value? spriteInput.value.trim() : "17600";
           if (spriteID) sessionStorage.setItem('playerSprite', `https://files.meebits.app/sprites/${spriteID}.png`);
 
           window.location.href = 'play.html';
