@@ -65,7 +65,7 @@ function loadLevel() {
     }
 
     try {
-        
+
         gameState.levelData = JSON.parse(levelJSON);
         document.getElementById('level-name').textContent = levelFileName || 'Unknown Level';
 
@@ -90,7 +90,7 @@ function loadLevel() {
         spriteSheet.onload = () => {
             initializeLevel();
             gameLoop();
-            
+
         };
     } catch (error) {
         console.error('Error loading level:', error);
@@ -240,8 +240,6 @@ function getTileSpritePos(tileID) {
         h: TILE_SIZE_PIXELS
     };
 }
-
-
 
 
 // --- Update Stats ---

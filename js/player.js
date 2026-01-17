@@ -301,10 +301,21 @@ function checkCollisions() {
     });
 }
 
-// --- Rectangle Collision ---
 function checkRectCollision(a, b) {
-    return a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y;
+    const aLeft   = a.x + (a.def?.collision?.offsetX || 0);
+    const aRight  = aLeft + (a.def?.collision?.width || a.width);
+    const aTop    = a.y + (a.def?.collision?.offsetY || 0);
+    const aBottom = aTop + (a.def?.collision?.height || a.height);
+
+    const bLeft   = b.x + (b.def?.collision?.offsetX || 0);
+    const bRight  = bLeft + (b.def?.collision?.width || b.width);
+    const bTop    = b.y + (b.def?.collision?.offsetY || 0);
+    const bBottom = bTop + (b.def?.collision?.height || b.height);
+
+    return (
+        aLeft < bRight &&
+        aRight > bLeft &&
+        aTop < bBottom &&
+        aBottom > bTop
+    );
 }
