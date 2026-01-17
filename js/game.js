@@ -4,13 +4,16 @@ const NES_HEIGHT_PX = 240;
 const TILE_SIZE = 16;
 const META_SIZE = 16;
 const SCALE = 3;
+const MOBILE_SPEED_MULTIPLIER = 0.6
 
 // -- has the user interacted with the page yet?
 let firstInteract = false;
+let usingTouch = false;
 
 // --- Player Sprite ---
 const playerSprite = new Image();
 let playerSpriteReady = false;
+
 
 // --- Camera ---
 const camera = {
@@ -319,6 +322,10 @@ function update() {
 function updatePlayer() {
     const p = gameState.player;
 
+    const speed = usingTouch
+  ? p.speed * MOBILE_SPEED_MULTIPLIER
+  : p.speed;
+
     // Update direction
     if (p.velocityX > 0) p.direction = 'right';
     else if (p.velocityX < 0) p.direction = 'left';
@@ -337,8 +344,8 @@ function updatePlayer() {
 
     // --- Input ---
     p.velocityX = 0;
-    if (keys.ArrowLeft) p.velocityX = -p.speed;
-    if (keys.ArrowRight) p.velocityX = p.speed;
+    if (keys.ArrowLeft) p.velocityX = -speed;
+    if (keys.ArrowRight) p.velocityX = speed;
 
     if (keys.Space && p.onGround) {
         p.velocityY = -p.jumpPower;
@@ -842,6 +849,7 @@ function bindTouchButton(btn, keyName) {
   // When finger touches down, set key to true
   btn.addEventListener('touchstart', e => {
     handleFirstInteract();
+    usingTouch = true;
     keys[keyName] = true;
     e.preventDefault(); // prevent scrolling
   });
