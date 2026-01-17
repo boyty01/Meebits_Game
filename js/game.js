@@ -841,6 +841,7 @@ const jumpBtn = document.getElementById('jump-btn');
 function bindTouchButton(btn, keyName) {
   // When finger touches down, set key to true
   btn.addEventListener('touchstart', e => {
+    handleFirstInteract();
     keys[keyName] = true;
     e.preventDefault(); // prevent scrolling
   });
@@ -852,9 +853,18 @@ function bindTouchButton(btn, keyName) {
   });
 
   btn.addEventListener('touchcancel', e => {
+
     keys[keyName] = false;
     e.preventDefault();
   });
+}
+
+function handleFirstInteract() {
+    if(!firstInteract) {
+        sounds.music.loop = true;
+        sounds.music.play();
+        firstInteract = true;
+    }
 }
 
 // Bind the buttons
