@@ -139,6 +139,7 @@ body {
 }
 
 #touch-controls {
+  display:none;
   position: absolute;
   bottom: 10px;
   left: 50%;
@@ -149,6 +150,7 @@ body {
 }
 
 .touch-btn {
+  display:none;
   width: 60px;
   height: 60px;
   font-size: 24px;
@@ -156,4 +158,45 @@ body {
   background: rgba(255, 255, 255, 0.6);
   border: 2px solid #000;
   touch-action: none; /* prevent scrolling */
+}
+
+/* --- Mobile Adjustments --- */
+@media (max-width: 600px) {
+  #game-viewport {
+    width: 100%;
+    height: auto;
+    border-width: 2px;
+  }
+
+  #game-canvas {
+    width: 100%;
+    height: auto;
+  }
+
+  #touch-controls {
+    display:flex;
+    gap: 12px;
+    bottom: 5%;
+  }
+
+  .touch-btn {
+    display:block;
+    width: 60px;
+    height: 60px;
+    font-size: 20px;
+    border-radius: 10px;
+  }
+
+  #game-container {
+    padding: 8px;
+  }
+
+  #game-header, #game-controls {
+    padding: 8px;
+  }
+
+  #game-stats {
+    font-size: 8px;
+    gap: 12px;
+  }
 }
