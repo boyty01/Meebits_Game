@@ -102,3 +102,73 @@ playBtn.addEventListener('click', () => {
       errorMessage.textContent = message;
       errorMessage.style.display = 'block';
     }
+
+    const defaultBtn = document.getElementById('default-btn');
+    const spriteInput = document.getElementById('sprite-id');
+
+    // Enable play button when file is selected
+    document.getElementById('upload-area').addEventListener('click', () => document.getElementById('file-input').click());
+    document.getElementById('file-input').addEventListener('change', (e) => {
+      selectedFile = e.target.files[0];
+      if (!selectedFile.name.endsWith('.json')) {
+        showError('Please select a valid JSON file!');
+        playBtn.disabled = true;
+        return;
+      }
+      fileNameDisplay.textContent = `✓ ${selectedFile.name}`;
+      playBtn.disabled = false;
+      errorMessage.style.display = 'none';
+    });
+
+    function showError(msg) {
+      const errorMessage = document.getElementById('error-message');
+      errorMessage.textContent = msg;
+      errorMessage.style.display = 'block';
+    }
+
+    // --- Play uploaded level ---
+    playBtn.addEventListener('click', () => {
+      if (!selectedFile) {
+        showError('Please select a level file first!');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const levelData = JSON.parse(e.target.result);
+          sessionStorage.setItem('currentLevel', JSON.stringify(levelData));
+          sessionStorage.setItem('levelFileName', selectedFile.name);
+
+          // Store sprite URL if provided
+          const spriteID = spriteInput.value.trim();
+          if (spriteID) sessionStorage.setItem('playerSprite', `https://files.meebits.app/sprites/${spriteID}.png`);
+
+          window.location.href = 'play.html';
+        } catch (err) {
+          showError('Invalid JSON file! Please check the format.');
+          console.error(err);
+        }
+      };
+      reader.readAsText(selectedFile);
+    });
+
+    // --- Play default level ---
+    defaultBtn.addEventListener('click', () => {
+      fetch('levels/level6.json') // relative path to your default level
+        .then(res => res.json())
+        .then(levelData => {
+          sessionStorage.setItem('currentLevel', JSON.stringify(levelData));
+          sessionStorage.setItem('levelFileName', 'Default Level');
+
+          // Store sprite URL if provided
+          const spriteID = spriteInput.value.trim();
+          if (spriteID) sessionStorage.setItem('playerSprite', `https://files.meebits.app/sprites/${spriteID}.png`);
+
+          window.location.href = 'play.html';
+        })
+        .catch(err => {
+          showError('Failed to load default level!');
+          console.error(err);
+        });
+    });

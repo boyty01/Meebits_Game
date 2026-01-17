@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,13 +9,11 @@
 </head>
 
 <body>
-
-  </div>
   <div class="container">
     <h1>NES GAME</h1>
 
-      <div class="subtitle">
-    <a href="editor.htm">Level Editor</a>
+    <div class="subtitle">
+      <a href="editor.htm">Level Editor</a>
     </div>
 
     <p class="subtitle">LEVEL SELECT</p>
@@ -32,9 +31,12 @@
       </div>
 
       <input type="file" id="file-input" accept=".json">
-<label for="sprite-id">Player Sprite ID:</label>
-<input type="text" id="sprite-id" placeholder="Enter SPRITE_ID (optional)" maxlength="100">
+
+      <label for="sprite-id">Player Sprite ID:</label>
+      <input type="text" id="sprite-id" placeholder="Enter SPRITE_ID (optional)" maxlength="100">
+
       <button id="play-btn" disabled>START GAME</button>
+      <button id="default-btn">PLAY DEFAULT LEVEL</button>
     </div>
 
     <div class="error-message" id="error-message"></div>
@@ -43,7 +45,6 @@
       💡 TIP: Export levels from the editor and load them here to play!
     </div>
   </div>
-
   <script src="js/level-list.js">
  
   </script>
