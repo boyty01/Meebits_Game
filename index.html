@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NES Game - Level Select</title>
+  <link rel="stylesheet" href="style/main.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>NES GAME</h1>
+    <p class="subtitle">LEVEL SELECT</p>
+
+    <div class="level-select-area">
+      <label>Choose a Level File:</label>
+      
+      <div class="file-upload-area" id="upload-area">
+        <div class="file-icon">📁</div>
+        <div class="file-text">
+          Click to browse or drag & drop<br>
+          your level JSON file here
+        </div>
+        <div class="file-name" id="file-name"></div>
+      </div>
+
+      <input type="file" id="file-input" accept=".json">
+<label for="sprite-id">Player Sprite ID:</label>
+<input type="text" id="sprite-id" placeholder="Enter SPRITE_ID (optional)" maxlength="100">
+      <button id="play-btn" disabled>START GAME</button>
+    </div>
+
+    <div class="error-message" id="error-message"></div>
+
+    <div class="info-box">
+      💡 TIP: Export levels from the editor and load them here to play!
+    </div>
+  </div>
+
+  <script src="js/level-list.js">
+ 
+  </script>
+</body>
+</html>

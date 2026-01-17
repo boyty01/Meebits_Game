@@ -1,0 +1,139 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  image-rendering: pixelated;
+}
+
+body {
+  background: #111;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+#game-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 800px;
+}
+
+#game-header {
+  background: #222;
+  border: 2px solid #555;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#level-name {
+  font-size: 14px;
+  color: #ffd700;
+}
+
+#game-stats {
+  display: flex;
+  gap: 20px;
+  font-size: 10px;
+}
+
+#game-viewport {
+  background: #000;
+  border: 4px solid #555;
+  position: relative;
+  width: fit-content;
+}
+
+#game-canvas {
+  display: block;
+  width: 768px;  /* 256px * 3 scale */
+  height: 720px; /* 240px * 3 scale */
+}
+
+#game-controls {
+  background: #222;
+  border: 2px solid #555;
+  padding: 12px;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.control-hint {
+  font-size: 8px;
+  color: #aaa;
+}
+
+/* Menus */
+.menu {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.95);
+  border: 4px solid #fff;
+  padding: 40px;
+  text-align: center;
+  min-width: 400px;
+  z-index: 1000;
+}
+
+.menu.hidden {
+  display: none;
+}
+
+.menu h2 {
+  font-size: 24px;
+  color: #ffd700;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 0 #000;
+}
+
+.menu p {
+  font-size: 12px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.menu button {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  margin: 10px 0;
+  font-size: 12px;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  background: #4CAF50;
+  color: #fff;
+  border: 3px solid #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.menu button:hover {
+  background: #5cb85f;
+  transform: scale(1.05);
+}
+
+.menu button:active {
+  transform: scale(0.95);
+}
+
+/* Overlay for pause/game over */
+.menu::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: -1;
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NES Level Editor</title>
+  <link rel="stylesheet" href="style/editor.css">
+</head>
+<body>
+
+<div id="editor-root">
+  <!-- Toolbar -->
+<div id="toolbar">
+  <button id="mode-tile" data-mode="tile">Tile (8×8)</button>
+  <button id="mode-meta" data-mode="meta">Meta (16×16)</button>
+  <button id="mode-collision" data-mode="collision">Collision</button>
+  <button id="mode-entity" data-mode="entity">Entities</button>
+</div>
+
+  <!-- Editor container (viewport + palette side by side) -->
+  <div id="editor-container">
+    <!-- Editor viewport -->
+    <div id="viewport">
+      <canvas id="editor-canvas"></canvas>
+    </div>
+
+    <!-- Palette -->
+    <div id="palette"></div>
+  </div>
+</div>
+
+  <script src="js/editor.js"></script>
+</body>
+</html>
