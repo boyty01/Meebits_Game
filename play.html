@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NES Game - Play</title>
   <link rel="stylesheet" href="style/game.css">
 </head>
+
 <body>
 
   <div id="touch-controls">
-  <button id="left-btn" class="touch-btn">◀</button>
-  <button id="right-btn" class="touch-btn">▶</button>
-  <button id="jump-btn" class="touch-btn">⬆</button>
-</div>
+    <button id="left-btn" class="touch-btn">◀</button>
+    <button id="right-btn" class="touch-btn">▶</button>
+    <button id="jump-btn" class="touch-btn">⬆</button>
+  </div>
 
   <div id="game-container">
     <div id="game-header">
@@ -49,6 +51,19 @@
     <button id="game-over-menu-btn">Main Menu</button>
   </div>
 
+
+  <!-- Game scripts. Load order is important! -->
+  <script src="js/audio.js"></script>
   <script src="js/game.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/input.js"></script>
+
+  <!-- Initialize the game after all scripts are imported. -->
+  <script>
+    // --- Initialize ---
+    loadLevel();
+  </script>
 </body>
+
 </html>
