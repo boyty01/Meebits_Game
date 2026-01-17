@@ -175,15 +175,15 @@ body {
 
   #touch-controls {
     display:flex;
-    gap: 12px;
+    gap: 20px;
     bottom: 5%;
   }
 
   .touch-btn {
     display:block;
-    width: 60px;
-    height: 60px;
-    font-size: 20px;
+    width: 120px;
+    height: 120px;
+    font-size: 30px;
     border-radius: 10px;
   }
 
