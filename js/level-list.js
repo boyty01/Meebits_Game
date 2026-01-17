@@ -141,7 +141,7 @@ playBtn.addEventListener('click', () => {
           sessionStorage.setItem('levelFileName', selectedFile.name);
 
           // Store sprite URL if provided
-          const spriteID = spriteInput.value.trim();
+          const spriteID = spriteInput.value? spriteInput.value.trim() : "17600";
           if (spriteID) sessionStorage.setItem('playerSprite', `https://files.meebits.app/sprites/${spriteID}.png`);
 
           window.location.href = 'play.html';
