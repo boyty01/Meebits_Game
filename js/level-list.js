@@ -156,7 +156,7 @@ playBtn.addEventListener('click', () => {
 
     // --- Play default level ---
     defaultBtn.addEventListener('click', () => {
-      fetch('levels/level6.json') // relative path to your default level
+     fetch('levels/level6.json') // relative path to your default level
         .then(res => res.json())
         .then(levelData => {
           sessionStorage.setItem('currentLevel', JSON.stringify(levelData));
@@ -164,6 +164,7 @@ playBtn.addEventListener('click', () => {
 
           // Store sprite URL if provided
          const spriteID = spriteInput.value? spriteInput.value.trim() : "17600";
+         console.log(spriteID)
           if (spriteID) sessionStorage.setItem('playerSprite', `https://files.meebits.app/sprites/${spriteID}.png`);
 
           window.location.href = 'play.html';

@@ -833,5 +833,34 @@ document.getElementById('game-over-menu-btn').addEventListener('click', () => {
     window.location.href = 'index.html';
 });
 
+// Reference buttons
+const leftBtn = document.getElementById('left-btn');
+const rightBtn = document.getElementById('right-btn');
+const jumpBtn = document.getElementById('jump-btn');
+
+function bindTouchButton(btn, keyName) {
+  // When finger touches down, set key to true
+  btn.addEventListener('touchstart', e => {
+    keys[keyName] = true;
+    e.preventDefault(); // prevent scrolling
+  });
+
+  // When finger lifts, set key to false
+  btn.addEventListener('touchend', e => {
+    keys[keyName] = false;
+    e.preventDefault();
+  });
+
+  btn.addEventListener('touchcancel', e => {
+    keys[keyName] = false;
+    e.preventDefault();
+  });
+}
+
+// Bind the buttons
+bindTouchButton(leftBtn, 'ArrowLeft');
+bindTouchButton(rightBtn, 'ArrowRight');
+bindTouchButton(jumpBtn, 'Space');
+
 // --- Initialize ---
 loadLevel();
