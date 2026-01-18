@@ -98,7 +98,7 @@ function renderIntro() {
     });
     
     // Scroll up
-    introState.scrollY -= 0.8;
+    introState.scrollY -= 0.4;
     
     // When text has scrolled off screen, move to final phase
     const totalHeight = introText.length * lineHeight;
