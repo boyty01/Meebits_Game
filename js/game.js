@@ -68,6 +68,7 @@ const TILE_SIZE_PIXELS = 16;
 // --- Load Level ---
 function loadLevel() {
     sounds.intromusic.pause();
+    sounds.music.looping = true;
     sounds.music.play();
     const levelJSON = sessionStorage.getItem('currentLevel');
     const levelFileName = sessionStorage.getItem('levelFileName');
