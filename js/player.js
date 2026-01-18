@@ -12,7 +12,7 @@ const camera = {
 };
 
 function setPlayerSpawn(spawn) {
-    if(spawn.x && spawn.y)
+    if(spawn && spawn.x && spawn.y)
     {
         gameState.player.x = spawn.x;
         gameState.player.y = spawn.y; 

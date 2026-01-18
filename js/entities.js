@@ -69,17 +69,17 @@ const ENTITY_DEFS = {
             row: 1
         },
         render: {
-            width: 64,
-            height: 64,
+            width: 40,
+            height: 40,
             offsetY:38,
-            offsetX:0,
+            offsetX:-20,
             scale: 1
         },
         collision: {
-            width: 32,
-            height: 50,
+            width: 16,
+            height: 20,
             offsetX: 8,
-            offsetY: -34
+            offsetY: 4
         }
     },
     enemy2: {
