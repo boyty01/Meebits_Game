@@ -1,5 +1,5 @@
 const debug = {
-    collision: true
+    collision: false
 };
 
 // --- Game Constants ---
@@ -26,7 +26,7 @@ const gameState = {
         velocityX: 0,
         velocityY: 0,
         speed: 2,
-        jumpPower: 5,
+        jumpPower: 6,
         gravity: 0.3,
         onGround: false,
         direction: 'right',      // 'left' or 'right'
