@@ -85,14 +85,16 @@ const EntityTypes = Object.freeze({
 //  ENEMY2: 'enemy2',
   GOAL:`goal`,
   COLLECTIBLE: 'collectible',
-  BREAKABLE: 'breakable'
+  BREAKABLE: 'breakable',
+  SPAWN: "spawn"
 });
 
 const EntityColors = {
   enemy1: { bg: 'rgba(255, 100, 100, 0.8)', label: 'E1' },
   goal: { bg: 'rgba(0, 255, 85, 0.8)', label: 'G' },
   collectible: { bg: 'rgba(255, 215, 0, 0.8)', label: 'C' },
-  breakable: { bg: 'rgba(150, 100, 200, 0.8)', label: 'B' }
+  breakable: { bg: 'rgba(150, 100, 200, 0.8)', label: 'B' },
+  spawn:{ bg: 'rgba(0, 255, 115, 0.8)', label: 'S' },
 };
 
 // --- Sprite sheet setup ---

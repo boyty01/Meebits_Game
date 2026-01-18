@@ -48,6 +48,7 @@ const gameState = {
     enemies: [],
     collectibles: [],
     breakables: [],
+    playerSpawn: null,
     goal: null,
 };
 
@@ -126,8 +127,7 @@ function initializeLevel() {
     loadAllEntities();
 
     // Reset player position
-    gameState.player.x = 32;
-    gameState.player.y = 200;
+    setPlayerSpawn(gameState.playerSpawn);
     gameState.player.velocityX = 0;
     gameState.player.velocityY = 0;
 }

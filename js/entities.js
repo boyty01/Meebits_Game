@@ -16,6 +16,28 @@ function loadEntityImages() {
 }
 
 const ENTITY_DEFS = {
+     spawn: {
+        image: ``,
+         sprite: {
+            frameWidth: 468,   
+            frameHeight: 468,
+            frames: 1,
+            row: 0
+        },
+        render: {
+            width: 64,
+            height: 64,
+            offsetY:40,
+            offsetX:0,
+            scale: 1
+        },
+        collision: {
+            width: 16,
+            height: 60,
+            offsetX: 0,
+            offsetY: -40
+        }
+    },
     goal: {
         image: `entities/ethflag.png`,
          sprite: {
@@ -163,6 +185,8 @@ function loadAllEntities() {
                 gameState.breakables.push(obj);
             } else if (entity.type === "goal") {
                 gameState.goal = obj; // only one goal. editor should be updated to reflect this limitation.
+            } else if (entity.type === "spawn") {
+                gameState.playerSpawn = obj;
             }
         });
     });

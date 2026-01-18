@@ -11,6 +11,16 @@ const camera = {
     height: NES_HEIGHT_PX
 };
 
+function setPlayerSpawn(spawn) {
+    if(spawn.x && spawn.y)
+    {
+        gameState.player.x = spawn.x;
+        gameState.player.y = spawn.y; 
+        return;
+    }
+    gameState.player.x = 32;
+    gameState.player.y = 200;
+}
 
 function updateCamera() {
     const player = gameState.player;
