@@ -691,21 +691,33 @@ function exportLevel() {
   
   // Export all screens
   Object.keys(levelScreens).forEach(screenIndex => {
-levelJSON.screens[screenIndex] = {
-  tiles: levelScreens[screenIndex].metaTiles,
-  collision: levelScreens[screenIndex].metaCollision,
-  entities: levelScreens[screenIndex].metaEntities
-};
+    levelJSON.screens[screenIndex] = {
+      tiles: levelScreens[screenIndex].metaTiles,
+      collision: levelScreens[screenIndex].metaCollision,
+      entities: levelScreens[screenIndex].metaEntities
+    };
   });
   
   const jsonString = JSON.stringify(levelJSON, null, 2);
+  
+  // Prompt user for filename
+  const defaultName = `level_${editorState.mode}_${Date.now()}`;
+  const fileName = prompt('Enter a name for your level:', defaultName);
+  
+  // If user cancels, don't save
+  if (fileName === null) {
+    return;
+  }
+  
+  // Use provided name or default if empty
+  const finalName = fileName.trim() || defaultName;
   
   // Download as file
   const blob = new Blob([jsonString], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `level_${editorState.mode}_${Date.now()}.json`;
+  a.download = `${finalName}.json`;
   a.click();
   URL.revokeObjectURL(url);
   
