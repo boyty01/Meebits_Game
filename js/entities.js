@@ -234,6 +234,7 @@ function updateEntityAnimation(ent, dt) {
 }
 
 function renderEntity(ent) {
+    if(!ent || !ent.def) return;
     const def = ent.def;
     const img = imageCache[def.image];
     if (!img || !img.complete) return;
