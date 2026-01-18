@@ -1,5 +1,5 @@
 const debug = {
-    collision: true
+    collision: false
 };
 
 // --- Game Constants ---
