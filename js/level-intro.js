@@ -205,3 +205,35 @@ function startGame() {
 document.addEventListener('keydown', checkIntroSkip);
 introLoop();
 
+function handleIntroConfirm() {
+  if (introState.phase === -1) {
+    // First press: start intro
+    if (sounds.bgMusic) {
+      sounds.bgMusic.play().catch(err =>
+        console.log('Audio play failed:', err)
+      );
+    }
+    introState.phase = 0;
+    introState.timer = 0;
+  } else if (introState.phase >= 1) {
+    // Skip to game
+    introState.active = false;
+    document.removeEventListener('keydown', checkIntroSkip);
+    startGame();
+  }
+}
+
+const jumpButton = document.getElementById('jump-btn');
+
+if (jumpButton) {
+  jumpButton.addEventListener('touchstart', (e) => {
+    e.preventDefault(); // prevents double fire / scroll
+    handleIntroConfirm();
+  });
+
+  // Optional: allow mouse click for desktop testing
+  jumpButton.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    handleIntroConfirm();
+  });
+}
