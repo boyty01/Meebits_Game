@@ -234,4 +234,9 @@ if (jumpButton) {
     handleIntroConfirm();
   });
 
+  // Optional: allow mouse click for desktop testing
+  jumpButton.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    handleIntroConfirm();
+  });
 }
