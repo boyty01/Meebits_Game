@@ -6,6 +6,8 @@ const introState = {
   scrollY: 0
 };
 
+const introFinished = false;
+
 // --- Intro text content ---
 const introText = [
   '',
@@ -206,6 +208,7 @@ document.addEventListener('keydown', checkIntroSkip);
 introLoop();
 
 function handleIntroConfirm() {
+    if(introState.active == false) return;
   if (introState.phase === -1) {
     // First press: start intro
     if (sounds.bgMusic) {
@@ -217,8 +220,8 @@ function handleIntroConfirm() {
     introState.timer = 0;
   } else if (introState.phase >= 1) {
     // Skip to game
+    
     introState.active = false;
-    document.removeEventListener('keydown', checkIntroSkip);
     startGame();
   }
 }
@@ -231,9 +234,4 @@ if (jumpButton) {
     handleIntroConfirm();
   });
 
-  // Optional: allow mouse click for desktop testing
-  jumpButton.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-    handleIntroConfirm();
-  });
 }
