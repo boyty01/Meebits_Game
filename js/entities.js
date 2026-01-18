@@ -1,6 +1,6 @@
 const collectibleSprite = new Image();
 let collectibleReady = false;
-collectibleSprite.src = 'entities/bitcoin_s.png';// path to your image
+collectibleSprite.src = 'entities/eth.png';// path to your image
 collectibleSprite.onload = () => collectibleReady = true;
 
 const imageCache = {};
@@ -16,6 +16,28 @@ function loadEntityImages() {
 }
 
 const ENTITY_DEFS = {
+    goal: {
+        image: `entities/ethflag.png`,
+         sprite: {
+            frameWidth: 468,   
+            frameHeight: 468,
+            frames: 1,
+            row: 0
+        },
+        render: {
+            width: 64,
+            height: 64,
+            offsetY:40,
+            offsetX:0,
+            scale: 1
+        },
+        collision: {
+            width: 16,
+            height: 60,
+            offsetX: 0,
+            offsetY: -40
+        }
+    },
     enemy1: {
         image: 'entities/goblin.png',
         sprite: {
@@ -25,15 +47,17 @@ const ENTITY_DEFS = {
             row: 1
         },
         render: {
-            width: 25,
-            height: 24,
+            width: 64,
+            height: 64,
+            offsetY:38,
+            offsetX:0,
             scale: 1
         },
         collision: {
             width: 32,
-            height: 32,
+            height: 50,
             offsetX: 8,
-            offsetY: 2
+            offsetY: -34
         }
     },
     enemy2: {
@@ -101,8 +125,8 @@ function loadAllEntities() {
                 def: ENTITY_DEFS[entity.type],
                 x: entity.col * TILE_SIZE + screenOffsetX,
                 y: entity.row * TILE_SIZE,
-                width: ENTITY_DEFS[entity.type].sprite.frameWidth,
-                height: ENTITY_DEFS[entity.type].sprite.frameHeight,
+                width: ENTITY_DEFS[entity.type].render.width,
+                height: ENTITY_DEFS[entity.type].render.height,
                 frame: 0,
                 frameTick: 0,
                 active: true
@@ -115,6 +139,8 @@ function loadAllEntities() {
                 gameState.totalCollectibles++;
             } else if (entity.type === 'breakable') {
                 gameState.breakables.push(obj);
+            } else if (entity.type === "goal") {
+                gameState.goal = obj; // only one goal. editor should be updated to reflect that.
             }
         });
     });
@@ -175,12 +201,12 @@ function renderEntity(ent) {
     const frameX = (ent.frame % frames) * frameW;
     const frameY = row * frameH;
 
-    const offsetY = ent.height - def.render.height
-    const offsetX = ent.width - def.render.width;
+    const offsetY = def.render.offsetY
+    const offsetX = def.render.offsetX;
     ctx.drawImage(
         img,
         frameX, frameY, frameW, frameH,       // source rectangle
-        ent.x - gameState.cameraX,
+        ent.x - gameState.cameraX - offsetX,
         ent.y - gameState.cameraY - offsetY,
         ent.width,
         ent.height
@@ -235,5 +261,7 @@ function renderEntities() {
         if (!ent.active) return;
         renderEntity(ent);   // ← call our sprite renderer here
     });
+
+    renderEntity(gameState.goal);
 }
 

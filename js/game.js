@@ -1,3 +1,7 @@
+const debug = {
+    collision: true
+};
+
 // --- Game Constants ---
 const NES_WIDTH_PX = 256;
 const NES_HEIGHT_PX = 240;
@@ -28,7 +32,13 @@ const gameState = {
         direction: 'right',      // 'left' or 'right'
         animFrame: 0,            // current frame index
         animTimer: 0,            // counter to cycle frames
-        animSpeed: 6             // frames to wait per sprite frame
+        animSpeed: 6,             // frames to wait per sprite frame
+        collisionBox: {
+            width: 12,
+            height: 32,
+            offsetX: 2,
+            offsetY: -16
+        }
     },
     score: 0,
     collectiblesCollected: 0,
@@ -37,7 +47,8 @@ const gameState = {
     gameOver: false,
     enemies: [],
     collectibles: [],
-    breakables: []
+    breakables: [],
+    goal: null,
 };
 
 // --- Canvas Setup ---
@@ -260,8 +271,9 @@ function togglePause() {
 function gameOver(message, isWin = false) {
     gameState.gameOver = true;
     sounds.music.pause();
-    sounds.gameover.currentTime = 0;
-    sounds.gameover.play();
+    let goSound = isWin ? sounds.success : sounds.gameover;
+    goSound.currentTime = 0;
+    goSound.play();
     document.getElementById('game-over-message').textContent = message;
     document.getElementById('game-over-menu').classList.remove('hidden');
 }

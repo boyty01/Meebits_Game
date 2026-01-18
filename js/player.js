@@ -38,8 +38,8 @@ function updatePlayer() {
     const p = gameState.player;
 
     const speed = usingTouch
-  ? p.speed * MOBILE_SPEED_MULTIPLIER
-  : p.speed;
+        ? p.speed * MOBILE_SPEED_MULTIPLIER
+        : p.speed;
 
     // Update direction
     if (p.velocityX > 0) p.direction = 'right';
@@ -65,7 +65,7 @@ function updatePlayer() {
     if (keys.Space && p.onGround) {
         p.velocityY = -p.jumpPower;
         p.onGround = false;
-        if(sounds.jump) sounds.jump.currentTime = 0;
+        if (sounds.jump) sounds.jump.currentTime = 0;
         sounds.jump.play();
     }
 
@@ -92,17 +92,20 @@ function updatePlayer() {
     if (p.y > NES_HEIGHT_PX) gameOver('You fell to your doom');
 }
 
-
-// --- Tile Collision ---
 // --- Handle Tile Collision (multi-screen aware) ---
 function handleTileCollision() {
     const player = gameState.player;
     const levelScreens = gameState.levelData.screens;
+    const collisionBox = player.collisionBox;
+    const pLeft = player.x + (collisionBox?.offsetX || 0);
+    const pTop = player.y + (collisionBox?.offsetY || 0);
+    const pWidth = collisionBox?.width || player.width;
+    const pHeight = collisionBox?.height || player.height;
 
-    const left = Math.floor(player.x / TILE_SIZE);
-    const right = Math.floor((player.x + player.width - 1) / TILE_SIZE);
-    const top = Math.floor(player.y  / TILE_SIZE);
-    const bottom = Math.floor( (player.y  + player.height - 1) / TILE_SIZE);
+    const left = Math.floor(pLeft / TILE_SIZE);
+    const right = Math.floor((pLeft + pWidth - 1) / TILE_SIZE);
+    const top = Math.floor(pTop / TILE_SIZE);
+    const bottom = Math.floor((pTop + pHeight - 1) / TILE_SIZE);
 
     const screenWidthTiles = NES_WIDTH_PX / TILE_SIZE;
 
@@ -120,16 +123,17 @@ function handleTileCollision() {
         for (let r = top; r <= bottom; r++) {
             for (let screenIndex of [leftScreen, rightScreen]) {
                 const screen = levelScreens[screenIndex];
-                if (!screen || !screen.tiles) continue;
+                if (!screen || !screen.collision) continue;
 
                 const screenOffsetCol = screenIndex * screenWidthTiles;
 
                 for (let c = leftCol; c <= rightCol; c++) {
                     const localCol = c - screenOffsetCol;
-                    if (r < 0 || r >= screen.tiles.length) continue;
-                    if (localCol < 0 || localCol >= screen.tiles[0].length) continue;
+                    if (r < 0 || r >= screen.collision.length) continue;
+                    if (localCol < 0 || localCol >= screen.collision[0].length) continue;
 
-                    if (screen.tiles[r][localCol]) {
+                    // CHECK COLLISION DATA, NOT TILES
+                    if (screen.collision[r][localCol] === true) {
                         // Snap next to wall
                         if (player.velocityX > 0) {
                             player.x = c * TILE_SIZE - player.width;
@@ -154,7 +158,7 @@ function handleTileCollision() {
         let collidedY = false;
 
         const nextY = player.y + player.velocityY;
-        const topRow = Math.floor(nextY / TILE_SIZE );
+        const topRow = Math.floor(nextY / TILE_SIZE);
         const bottomRow = Math.floor((nextY + player.height - 1) / TILE_SIZE);
 
         const leftScreen = Math.floor(left / screenWidthTiles);
@@ -163,14 +167,15 @@ function handleTileCollision() {
         for (let c = left; c <= right; c++) {
             for (let screenIndex of [leftScreen, rightScreen]) {
                 const screen = levelScreens[screenIndex];
-                if (!screen || !screen.tiles) continue;
+                if (!screen || !screen.collision) continue;
 
                 const screenOffsetCol = screenIndex * screenWidthTiles;
                 const localCol = c - screenOffsetCol;
 
                 if (player.velocityY > 0) { // falling
-                    if (screen.tiles[bottomRow] && localCol >= 0 && localCol < screen.tiles[0].length) {
-                        if (screen.tiles[bottomRow][localCol]) {
+                    if (screen.collision[bottomRow] && localCol >= 0 && localCol < screen.collision[0].length) {
+                        // CHECK COLLISION DATA, NOT TILES
+                        if (screen.collision[bottomRow][localCol] === true) {
                             player.y = bottomRow * TILE_SIZE - player.height;
                             player.velocityY = 0;
                             player.onGround = true;
@@ -179,8 +184,9 @@ function handleTileCollision() {
                         }
                     }
                 } else if (player.velocityY < 0) { // jumping
-                    if (screen.tiles[topRow] && localCol >= 0 && localCol < screen.tiles[0].length) {
-                        if (screen.tiles[topRow][localCol]) {
+                    if (screen.collision[topRow] && localCol >= 0 && localCol < screen.collision[0].length) {
+                        // CHECK COLLISION DATA, NOT TILES
+                        if (screen.collision[topRow][localCol] === true) {
                             player.y = (topRow + 1) * TILE_SIZE;
                             player.velocityY = 0;
                             collidedY = true;
@@ -200,7 +206,6 @@ function handleTileCollision() {
 }
 
 
-
 // Helper to check if collision data has any true values
 function hasAnyCollision(collisionData) {
     if (!collisionData) return false;
@@ -213,6 +218,9 @@ function hasAnyCollision(collisionData) {
 }
 
 function renderPlayer() {
+
+    if (debug.collision) renderCollisionBoxes();
+
     const player = gameState.player;
     const SPRITE_FRAME = 80; // frame size in sheet
     const RENDER_SCALE = 3;  // how big you want player on-screen
@@ -233,7 +241,7 @@ function renderPlayer() {
             SPRITE_FRAME,            // source width
             SPRITE_FRAME,            // source height
             player.x - gameState.cameraX - 16,  // canvas x
-            player.y - 16 * (RENDER_SCALE -1),                     // canvas y
+            player.y - 16 * (RENDER_SCALE - 1),                     // canvas y
             player.width * RENDER_SCALE,  // dest width
             player.height * RENDER_SCALE  // dest height
         );
@@ -299,18 +307,28 @@ function checkCollisions() {
             updateStats();
         }
     });
+
+    if (!gameState.goal) return;
+
+    if (checkRectCollision(player, gameState.goal)) {
+        gameOver(`You reached the goal!`, true);
+    }
 }
 
 function checkRectCollision(a, b) {
-    const aLeft   = a.x + (a.def?.collision?.offsetX || 0);
-    const aRight  = aLeft + (a.def?.collision?.width || a.width);
-    const aTop    = a.y + (a.def?.collision?.offsetY || 0);
-    const aBottom = aTop + (a.def?.collision?.height || a.height);
+    // Player uses collisionBox, entities use def.collision
+    const aCollision = a.collisionBox || a.def?.collision;
+    const bCollision = b.collisionBox || b.def?.collision;
 
-    const bLeft   = b.x + (b.def?.collision?.offsetX || 0);
-    const bRight  = bLeft + (b.def?.collision?.width || b.width);
-    const bTop    = b.y + (b.def?.collision?.offsetY || 0);
-    const bBottom = bTop + (b.def?.collision?.height || b.height);
+    const aLeft = a.x + (aCollision?.offsetX || 0);
+    const aRight = aLeft + (aCollision?.width || a.width);
+    const aTop = a.y + (aCollision?.offsetY || 0);
+    const aBottom = aTop + (aCollision?.height || a.height);
+
+    const bLeft = b.x + (bCollision?.offsetX || 0);
+    const bRight = bLeft + (bCollision?.width || b.width);
+    const bTop = b.y + (bCollision?.offsetY || 0);
+    const bBottom = bTop + (bCollision?.height || b.height);
 
     return (
         aLeft < bRight &&
@@ -318,4 +336,75 @@ function checkRectCollision(a, b) {
         aTop < bBottom &&
         aBottom > bTop
     );
+}
+
+
+// ------ debug -----
+
+function renderCollisionBoxes() {
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+    ctx.lineWidth = 1;
+
+    // Player collision box
+    const p = gameState.player;
+    const pCollision = p.collisionBox;
+    const pLeft = p.x + (pCollision?.offsetX || 0);
+    const pTop = p.y + (pCollision?.offsetY || 0);
+    const pWidth = pCollision?.width || p.width;
+    const pHeight = pCollision?.height || p.height;
+
+    ctx.strokeRect(
+        pLeft - gameState.cameraX,
+        pTop - gameState.cameraY,
+        pWidth,
+        pHeight
+    );
+
+    // Enemy collision boxes
+    gameState.enemies.forEach(ent => {
+        if (!ent.active) return;
+        const left = ent.x + (ent.def?.collision?.offsetX || 0);
+        const top = ent.y + (ent.def?.collision?.offsetY || 0);
+        const width = ent.def?.collision?.width || ent.width;
+        const height = ent.def?.collision?.height || ent.height;
+
+        ctx.strokeRect(
+            left - gameState.cameraX,
+            top - gameState.cameraY,
+            width,
+            height
+        );
+    });
+
+    // Collectible collision boxes
+    gameState.collectibles.forEach(ent => {
+        if (!ent.active) return;
+        const left = ent.x + (ent.def?.collision?.offsetX || 0);
+        const top = ent.y + (ent.def?.collision?.offsetY || 0);
+        const width = ent.def?.collision?.width || ent.width;
+        const height = ent.def?.collision?.height || ent.height;
+
+        ctx.strokeRect(
+            left - gameState.cameraX,
+            top - gameState.cameraY,
+            width,
+            height
+        );
+
+    });
+
+        if (gameState.goal) {
+            const left = gameState.goal.x + (gameState.goal.def.collision?.offsetX || 0);
+            const top = gameState.goal.y + (gameState.goal.def.collision?.offsetY || 0);
+            const width = gameState.goal.def.collision?.width || gameState.goal.width;
+            const height = gameState.goal.def.collision?.height || gameState.goal.height;
+
+            ctx.strokeRect(
+                left - gameState.cameraX,
+                top - gameState.cameraY,
+                width,
+                height
+            );
+
+        }
 }

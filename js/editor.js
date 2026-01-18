@@ -9,6 +9,11 @@ const META_SIZE = 16;         // 16x16 px (2x2 tiles)
 const NES_WIDTH_PX  = NES_WIDTH_TILES * TILE_SIZE;   // 256
 const NES_HEIGHT_PX = NES_HEIGHT_TILES * TILE_SIZE;  // 240
 
+// key tracking
+const keys = {
+  Shift: false
+};
+
 // --- Editor modes ---
 const EditorMode = Object.freeze({
   TILE: 'tile',      // 32x30
@@ -18,9 +23,9 @@ const EditorMode = Object.freeze({
 });
 
 const editorState = {
-  mode: EditorMode.TILE,
+  mode: EditorMode.META,
   currentScreen: 0,  // Current screen index
-  baseMode: EditorMode.TILE  // Track whether we're in TILE or META for collision/entity modes
+  baseMode: EditorMode.META  // Track whether we're in TILE or META for collision/entity modes
 };
 
 // Multi-screen level data storage
@@ -49,8 +54,27 @@ ctx.imageSmoothingEnabled = false;
 // --- Mouse state ---
 const mouseState = {
   col: -1,
-  row: -1
+  row: -1,
+  isDrawing: false  // Add this
 };
+
+// Add mousedown handler
+canvas.addEventListener('mousedown', (e) => {
+  mouseState.isDrawing = true;
+  // Trigger initial paint
+  const evt = new MouseEvent('click');
+  canvas.dispatchEvent(evt);
+});
+
+// Add mouseup handlers
+canvas.addEventListener('mouseup', () => {
+  mouseState.isDrawing = false;
+});
+
+document.addEventListener('mouseup', () => {
+  mouseState.isDrawing = false;
+});
+
 
 // --- Palette state ---
 let selectedTileID = 1;
@@ -58,14 +82,15 @@ let selectedEntityType = 'enemy1'; // Default entity type
 
 const EntityTypes = Object.freeze({
   ENEMY1: 'enemy1',
-  ENEMY2: 'enemy2',
+//  ENEMY2: 'enemy2',
+  GOAL:`goal`,
   COLLECTIBLE: 'collectible',
   BREAKABLE: 'breakable'
 });
 
 const EntityColors = {
   enemy1: { bg: 'rgba(255, 100, 100, 0.8)', label: 'E1' },
-  enemy2: { bg: 'rgba(255, 150, 50, 0.8)', label: 'E2' },
+  goal: { bg: 'rgba(0, 255, 85, 0.8)', label: 'G' },
   collectible: { bg: 'rgba(255, 215, 0, 0.8)', label: 'C' },
   breakable: { bg: 'rgba(150, 100, 200, 0.8)', label: 'B' }
 };
@@ -210,10 +235,25 @@ function setMode(mode) {
   // Show/hide palette based on mode
   const palette = document.getElementById('palette');
   const entityPalette = document.getElementById('entity-palette');
+  const collisionInstructions = document.getElementById('collision-instructions');
+  const entityInstructions = document.getElementById('entity-instructions');
+  
+  // Remove old instructions if they exist
+  if (collisionInstructions) collisionInstructions.remove();
+  if (entityInstructions) entityInstructions.remove();
   
   if (mode === EditorMode.COLLISION) {
     palette.style.display = 'none';
     if (entityPalette) entityPalette.style.display = 'none';
+    
+    // Create collision instructions
+    createInstructionPanel('collision-instructions', [
+      '🖱️ Click & Drag: Paint collision',
+      '⇧ Shift + Drag: Erase collision',
+      '📦 Red tiles = solid/blocked',
+      '⬜ Empty = passable'
+    ]);
+    
   } else if (mode === EditorMode.ENTITY) {
     palette.style.display = 'none';
     if (!entityPalette) {
@@ -221,6 +261,15 @@ function setMode(mode) {
     } else {
       entityPalette.style.display = 'grid';
     }
+    
+    // Create entity instructions
+    createInstructionPanel('entity-instructions', [
+      '🖱️ Click & Drag: Place entities',
+      '⇧ Shift + Drag: Remove entities',
+      '👆 Select entity type from palette',
+      '📍 One entity per cell'
+    ]);
+    
   } else {
     palette.style.display = 'grid';
     if (entityPalette) entityPalette.style.display = 'none';
@@ -236,10 +285,15 @@ collisionBtn.addEventListener('click', () => setMode(EditorMode.COLLISION));
 entityBtn.addEventListener('click', () => setMode(EditorMode.ENTITY));
 
 // Init
-setMode(EditorMode.TILE);
+setMode(EditorMode.META);
 
 canvas.addEventListener('mousemove', (e) => {
   updateHoverCell(e);
+ // Paint if mouse is down
+  if (mouseState.isDrawing && mouseState.col !== -1 && mouseState.row !== -1) {
+    paintCell(mouseState.col, mouseState.row);
+  }
+  
   drawGrid();
 });
 
@@ -256,6 +310,38 @@ function clearCanvas() {
 }
 
 clearCanvas();
+
+// Extract paint logic into function
+// Update paintCell function
+function paintCell(col, row) {
+  if (editorState.mode === EditorMode.COLLISION) {
+    const collisionData = getCurrentCollisionData();
+    collisionData[row][col] = !keys.Shift;  // Shift = erase, no Shift = paint
+  } else if (editorState.mode === EditorMode.ENTITY) {
+    const entityData = getCurrentEntityData();
+    const existingIndex = entityData.findIndex(e => e.col === col && e.row === row);
+    
+    if (keys.Shift) {
+      // Shift held = remove entity
+      if (existingIndex >= 0) {
+        entityData.splice(existingIndex, 1);
+      }
+    } else {
+      // No shift = add entity
+      if (existingIndex < 0) {
+        entityData.push({
+          type: selectedEntityType,
+          col: col,
+          row: row,
+          properties: {}
+        });
+      }
+    }
+  } else {
+    const levelData = getCurrentLevelData();
+    levelData[row][col] = selectedTileID;
+  }
+}
 
 // --- Grid rendering ---
 function drawGrid() {
@@ -508,41 +594,11 @@ function createScreenData() {
   };
 }
 
+// Update click handler to use paintCell
 canvas.addEventListener('click', () => {
   const { col, row } = mouseState;
   if (col === -1 || row === -1) return;
-
-  if (editorState.mode === EditorMode.COLLISION) {
-    // Toggle collision
-    const collisionData = getCurrentCollisionData();
-    collisionData[row][col] = !collisionData[row][col];
-  } else if (editorState.mode === EditorMode.ENTITY) {
-    // Entity placement
-    const entityData = getCurrentEntityData();
-    const existingIndex = entityData.findIndex(e => e.col === col && e.row === row);
-    
-    if (existingIndex >= 0) {
-      // Remove entity if clicking on same position
-      entityData.splice(existingIndex, 1);
-    } else {
-      // Add new entity with selected type
-      entityData.push({
-        type: selectedEntityType,
-        col: col,
-        row: row,
-        properties: {}
-      });
-    }
-  } else {
-    // Tile/Meta mode - paint tiles
-    const levelData = getCurrentLevelData();
-    if (levelData[row][col] === selectedTileID) {
-      levelData[row][col] = null;
-    } else {
-      levelData[row][col] = selectedTileID;
-    }
-  }
-
+  paintCell(col, row);
   drawGrid();
 });
 
@@ -558,6 +614,21 @@ function navigateScreen(direction) {
   drawGrid();
   updateScreenIndicator();
 }
+function floodFill() {
+  const levelData = getCurrentLevelData();
+  const { cols, rows } = getGridDimensions();
+  
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (levelData[r][c] === null) {
+        levelData[r][c] = selectedTileID;
+      }
+    }
+  }
+  
+  drawGrid();
+}
+
 
 // Keyboard navigation
 document.addEventListener('keydown', (e) => {
@@ -672,9 +743,9 @@ function importLevel(jsonData) {
           tiles: screenData.tiles || createLevelData(NES_WIDTH_TILES, NES_HEIGHT_TILES),
           collision: screenData.collision || createCollisionData(NES_WIDTH_TILES, NES_HEIGHT_TILES),
           entities: screenData.entities || [],
-          metaTiles: screenData.metaTiles || createLevelData(NES_WIDTH_TILES / 2, NES_HEIGHT_TILES / 2),
-          metaCollision: screenData.metaCollision || createCollisionData(NES_WIDTH_TILES / 2, NES_HEIGHT_TILES / 2),
-          metaEntities: screenData.metaEntities || []
+          metaTiles: screenData.tiles || createLevelData(NES_WIDTH_TILES / 2, NES_HEIGHT_TILES / 2),
+          metaCollision: screenData.collision || createCollisionData(NES_WIDTH_TILES / 2, NES_HEIGHT_TILES / 2),
+          metaEntities: screenData.entities || []
         };
       }
     });
@@ -803,4 +874,85 @@ function createEntityPalette() {
   // Insert after the palette div
   const palette = document.getElementById('palette');
   palette.parentNode.insertBefore(entityPalette, palette.nextSibling);
+
 }
+
+function clearGrid() {
+  if(!window.confirm("are you sure you want to clear this screen? Tiles, collision and entity data will be removed."))return;
+  const levelData = getCurrentLevelData();
+  const collisionData = getCurrentCollisionData();
+  console.log(collisionData)
+  const entityData = getCurrentEntityData();
+  console.log(entityData)
+  const { cols, rows } = getGridDimensions();
+  
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+        levelData[r][c] = null;
+        collisionData[r][c] = false;        
+    }
+  }
+
+  entityData.length = 0;
+
+
+  drawGrid();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Shift') {
+    keys.Shift = true;
+  }
+  // ... your existing keydown code
+});
+
+document.addEventListener('keyup', (e) => {
+  if (e.key === 'Shift') {
+    keys.Shift = false;
+  }
+});
+
+
+// Helper function to create instruction panels
+function createInstructionPanel(id, instructions) {
+  const panel = document.createElement('div');
+  panel.id = id;
+  panel.style.cssText = `
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #555;
+    padding: 16px;
+    font-size: 11px;
+    line-height: 1.8;
+    color: #eee;
+    border-radius: 4px;
+  `;
+  
+  const title = document.createElement('div');
+  title.textContent = id === 'collision-instructions' ? 'COLLISION MODE' : 'ENTITY MODE';
+  title.style.cssText = 'color: #ffd700; font-weight: bold; margin-bottom: 12px; font-size: 12px;';
+  panel.appendChild(title);
+  
+  instructions.forEach(text => {
+    const line = document.createElement('div');
+    line.textContent = text;
+    line.style.marginBottom = '6px';
+    panel.appendChild(line);
+  });
+  
+  // Insert after palette
+  const palette = document.getElementById('palette');
+  palette.parentNode.insertBefore(panel, palette.nextSibling);
+}
+
+
+  // Add button to toolbar (after the mode buttons)
+const fillBtn = document.createElement('button');
+fillBtn.textContent = 'Fill Empty';
+fillBtn.addEventListener('click', floodFill);
+toolbar.appendChild(fillBtn);
+
+// add clear button
+const clearBtn = document.createElement('button');
+clearBtn.textContent = 'Clear Grid';
+clearBtn.addEventListener(`click`, clearGrid);
+toolbar.appendChild(clearBtn);

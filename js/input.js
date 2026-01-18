@@ -8,7 +8,8 @@ const keys = {
     ArrowRight: false,
     ArrowUp: false,
     ArrowDown: false,
-    Space: false
+    Space: false,
+    Shift:false
 };
 
 
