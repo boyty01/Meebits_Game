@@ -25,7 +25,7 @@ const introText = [
   'Your mission is simple:',
   '',
   '  🟡 Collect tokens',
-  '  👹 Destroy Gas Goblins',
+  '  👹 Dodge Gas Goblins',
   '  ⚡ Keep gas low',
   '',
   'Jump, run, fight, and clear the chain —',
