@@ -4,7 +4,8 @@ const sounds = {
     collectCoin: new Audio('sound/coincollect.wav'),
     music: new Audio("sound/8bitmusic.wav"),
     gameover: new Audio("sound/gameover.wav"),
-    success: new Audio("sound/success.wav")
+    success: new Audio("sound/success.wav"),
+    intromusic: new Audio("sound/intromusic.wav")
 };
 
 //  preload sound

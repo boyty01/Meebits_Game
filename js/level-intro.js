@@ -1,7 +1,7 @@
 // --- Intro Sequence State ---
 const introState = {
   active: true,
-  phase: 0, // 0: fade title, 1: scroll text, 2: final prompt
+  phase: -1, // -1: press to start, 0: fade title, 1: scroll text, 2: final prompt
   timer: 0,
   scrollY: 0
 };
@@ -9,20 +9,18 @@ const introState = {
 // --- Intro text content ---
 const introText = [
   '',
-  'Somewhere deep inside', 
-  'the blockchain,',
+  'Somewhere deep inside the blockchain,', 
   'trouble is brewing.',
   '',
   'The Meebits have a job to do.',
   '',
-  'The Gas Goblins are running wild —',
+  'The Gas Goblins are running wild — ',
   'clogging blocks, stealing bandwidth,',
-  'and sending Ethereum gas prices',
-  'sky-high.',
+  'and sending Ethereum gas prices sky-high.',
   '',
-  'Every goblin left standing means',
-  'slower transactions, higher fees,',
-  'and pure on-chain chaos.',
+  'Every goblin left standing',
+  'means slower transactions,', 
+  'higher fees, and pure on-chain chaos.',
   '',
   'Your mission is simple:',
   '',
@@ -30,15 +28,55 @@ const introText = [
   '  👹 Destroy Gas Goblins',
   '  ⚡ Keep gas low',
   '',
-  'Jump, run, fight, and clear',
-  'the chain — one block at a time.',
+  'Jump, run, fight, and clear the chain —',
+  'one block at a time.',
   '',
-  'No goblins.',
-  'No congestion.',
-  'Cheap gas.',
+  'No goblins. No congestion. Cheap gas.',
   '',
   ''
 ];
+
+// --- Text wrapping helper ---
+function wrapText(text, maxWidth) {
+  const words = text.split(' ');
+  const lines = [];
+  let currentLine = '';
+  
+  words.forEach(word => {
+    const testLine = currentLine + (currentLine ? ' ' : '') + word;
+    const metrics = ctx.measureText(testLine);
+    
+    if (metrics.width > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  });
+  
+  if (currentLine) lines.push(currentLine);
+  return lines;
+}
+
+// --- Process text with wrapping ---
+let wrappedIntroText = [];
+
+function prepareIntroText() {
+  ctx.font = '6px "Press Start 2P", monospace';
+  const maxWidth = canvas.width - 40;
+  
+  wrappedIntroText = [];
+  introText.forEach(line => {
+    if (line === '') {
+      wrappedIntroText.push('');
+    } else {
+      const wrapped = wrapText(line, maxWidth);
+      wrappedIntroText.push(...wrapped);
+    }
+  });
+}
+
+prepareIntroText();
 
 // --- Intro Sequence ---
 function renderIntro() {
@@ -51,8 +89,20 @@ function renderIntro() {
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
   
+  // Phase -1: Initial "Press to Start"
+  if (introState.phase === -1) {
+    ctx.fillStyle = '#ffd700';
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.fillText('MEEBITS', centerX, centerY - 30);
+    
+    const blinkAlpha = Math.abs(Math.sin(introState.timer * 0.05));
+    ctx.fillStyle = `rgba(255, 255, 255, ${blinkAlpha})`;
+    ctx.font = '8px "Press Start 2P", monospace';
+    ctx.fillText('PRESS SPACE TO START', centerX, centerY + 30);
+  }
+  
   // Phase 0: Fade in/out title "GAS WARS"
-  if (introState.phase === 0) {
+  else if (introState.phase === 0) {
     let alpha = 0;
     
     // Fade in (0-60 frames)
@@ -75,19 +125,19 @@ function renderIntro() {
     }
     
     ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`;
-    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.font = '18px "Press Start 2P", monospace';
     ctx.fillText('⚔️ THE GAS WARS ⚔️', centerX, centerY);
   }
   
   // Phase 1: Scrolling text
   else if (introState.phase === 1) {
-    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.font = '10px "Press Start 2P", monospace';
     
     const lineHeight = 12;
     const startY = introState.scrollY;
     
     // Draw each line of text
-    introText.forEach((line, index) => {
+    wrappedIntroText.forEach((line, index) => {
       const y = startY + (index * lineHeight);
       
       // Only draw if on screen
@@ -98,10 +148,10 @@ function renderIntro() {
     });
     
     // Scroll up
-    introState.scrollY -= 0.4;
+    introState.scrollY -= 0.3;
     
     // When text has scrolled off screen, move to final phase
-    const totalHeight = introText.length * lineHeight;
+    const totalHeight = wrappedIntroText.length * lineHeight;
     if (introState.scrollY < -totalHeight - 50) {
       introState.phase = 2;
       introState.timer = 0;
@@ -130,8 +180,15 @@ function introLoop() {
 // --- Check for skip input ---
 function checkIntroSkip(e) {
   if (e.key === ' ' || e.key === 'Space') {
-    // Allow skip during scroll or final phase
-    if (introState.phase >= 1) {
+    if (introState.phase === -1) {
+      // First press - start music and begin intro
+      if (sounds.bgMusic) {
+        sounds.bgMusic.play().catch(err => console.log('Audio play failed:', err));
+      }
+      introState.phase = 0;
+      introState.timer = 0;
+    } else if (introState.phase >= 1) {
+      // Later presses - skip to game
       introState.active = false;
       document.removeEventListener('keydown', checkIntroSkip);
       startGame();
@@ -148,6 +205,3 @@ function startGame() {
 document.addEventListener('keydown', checkIntroSkip);
 introLoop();
 
-// Remove/comment out your existing calls:
-// initializeLevel();
-// gameLoop();
