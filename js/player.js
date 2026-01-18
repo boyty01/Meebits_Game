@@ -79,8 +79,10 @@ function updatePlayer() {
         sounds.jump.play();
     }
 
-    // --- Gravity ---
-    p.velocityY += p.gravity;
+    // --- Gravity (only when not on ground) ---
+    if (!p.onGround) {
+        p.velocityY += p.gravity;
+    }
 
     // --- Collision (NO position updates here) ---
     handleTileCollision();
@@ -103,6 +105,7 @@ function updatePlayer() {
 }
 
 // --- Handle Tile Collision (multi-screen aware) ---
+// --- Handle Tile Collision (multi-screen aware) ---
 function handleTileCollision() {
     const player = gameState.player;
     const levelScreens = gameState.levelData.screens;
@@ -112,23 +115,22 @@ function handleTileCollision() {
     const pWidth = collisionBox?.width || player.width;
     const pHeight = collisionBox?.height || player.height;
 
-    const left = Math.floor(pLeft / TILE_SIZE);
-    const right = Math.floor((pLeft + pWidth - 1) / TILE_SIZE);
-    const top = Math.floor(pTop / TILE_SIZE);
-    const bottom = Math.floor((pTop + pHeight - 1) / TILE_SIZE);
-
     const screenWidthTiles = NES_WIDTH_PX / TILE_SIZE;
 
     // --- Horizontal Collision ---
     if (player.velocityX !== 0) {
-        let collidedX = false;
-
         const nextX = player.x + player.velocityX;
-        const leftCol = Math.floor(nextX / TILE_SIZE);
-        const rightCol = Math.floor((nextX + player.width - 1) / TILE_SIZE);
+        const nextLeft = nextX + (collisionBox?.offsetX || 0);
+        const leftCol = Math.floor(nextLeft / TILE_SIZE);
+        const rightCol = Math.floor((nextLeft + pWidth - 1) / TILE_SIZE);
+
+        const top = Math.floor(pTop / TILE_SIZE);
+        const bottom = Math.floor((pTop + pHeight - 1) / TILE_SIZE);
 
         const leftScreen = Math.floor(leftCol / screenWidthTiles);
         const rightScreen = Math.floor(rightCol / screenWidthTiles);
+
+        let collidedX = false;
 
         for (let r = top; r <= bottom; r++) {
             for (let screenIndex of [leftScreen, rightScreen]) {
@@ -142,13 +144,12 @@ function handleTileCollision() {
                     if (r < 0 || r >= screen.collision.length) continue;
                     if (localCol < 0 || localCol >= screen.collision[0].length) continue;
 
-                    // CHECK COLLISION DATA, NOT TILES
                     if (screen.collision[r][localCol] === true) {
-                        // Snap next to wall
+                        // Snap to edge of tile
                         if (player.velocityX > 0) {
-                            player.x = c * TILE_SIZE - player.width;
+                            player.x = c * TILE_SIZE - pWidth - (collisionBox?.offsetX || 0);
                         } else if (player.velocityX < 0) {
-                            player.x = (c + 1) * TILE_SIZE;
+                            player.x = (c + 1) * TILE_SIZE - (collisionBox?.offsetX || 0);
                         }
                         player.velocityX = 0;
                         collidedX = true;
@@ -159,20 +160,22 @@ function handleTileCollision() {
             }
             if (collidedX) break;
         }
-
-        if (!collidedX) player.x += player.velocityX;
     }
 
     // --- Vertical Collision ---
     if (player.velocityY !== 0) {
-        let collidedY = false;
-
         const nextY = player.y + player.velocityY;
-        const topRow = Math.floor(nextY / TILE_SIZE);
-        const bottomRow = Math.floor((nextY + player.height - 1) / TILE_SIZE);
+        const nextTop = nextY + (collisionBox?.offsetY || 0);
+        const topRow = Math.floor(nextTop / TILE_SIZE);
+        const bottomRow = Math.floor((nextTop + pHeight - 1) / TILE_SIZE);
+
+        const left = Math.floor(pLeft / TILE_SIZE);
+        const right = Math.floor((pLeft + pWidth - 1) / TILE_SIZE);
 
         const leftScreen = Math.floor(left / screenWidthTiles);
         const rightScreen = Math.floor(right / screenWidthTiles);
+
+        let collidedY = false;
 
         for (let c = left; c <= right; c++) {
             for (let screenIndex of [leftScreen, rightScreen]) {
@@ -182,11 +185,12 @@ function handleTileCollision() {
                 const screenOffsetCol = screenIndex * screenWidthTiles;
                 const localCol = c - screenOffsetCol;
 
+                if (localCol < 0 || localCol >= screen.collision[0].length) continue;
+
                 if (player.velocityY > 0) { // falling
-                    if (screen.collision[bottomRow] && localCol >= 0 && localCol < screen.collision[0].length) {
-                        // CHECK COLLISION DATA, NOT TILES
+                    if (bottomRow >= 0 && bottomRow < screen.collision.length) {
                         if (screen.collision[bottomRow][localCol] === true) {
-                            player.y = bottomRow * TILE_SIZE - player.height;
+                            player.y = bottomRow * TILE_SIZE - pHeight - (collisionBox?.offsetY || 0);
                             player.velocityY = 0;
                             player.onGround = true;
                             collidedY = true;
@@ -194,10 +198,9 @@ function handleTileCollision() {
                         }
                     }
                 } else if (player.velocityY < 0) { // jumping
-                    if (screen.collision[topRow] && localCol >= 0 && localCol < screen.collision[0].length) {
-                        // CHECK COLLISION DATA, NOT TILES
+                    if (topRow >= 0 && topRow < screen.collision.length) {
                         if (screen.collision[topRow][localCol] === true) {
-                            player.y = (topRow + 1) * TILE_SIZE;
+                            player.y = (topRow + 1) * TILE_SIZE - (collisionBox?.offsetY || 0);
                             player.velocityY = 0;
                             collidedY = true;
                             break;
@@ -209,7 +212,6 @@ function handleTileCollision() {
         }
 
         if (!collidedY) {
-            player.y += player.velocityY;
             player.onGround = false;
         }
     }

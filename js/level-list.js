@@ -108,7 +108,7 @@ function getSpriteURL(spriteId) {
 
     // --- Play default level ---
     defaultBtn.addEventListener('click', () => {
-     fetch('levels/level6.json') // relative path to your default level
+     fetch('levels/level10-3.json') // relative path to your default level
         .then(res => res.json())
         .then(levelData => {
           sessionStorage.setItem('currentLevel', JSON.stringify(levelData));
