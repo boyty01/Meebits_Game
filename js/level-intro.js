@@ -98,7 +98,7 @@ function renderIntro() {
     const blinkAlpha = Math.abs(Math.sin(introState.timer * 0.05));
     ctx.fillStyle = `rgba(255, 255, 255, ${blinkAlpha})`;
     ctx.font = '8px "Press Start 2P", monospace';
-    ctx.fillText('PRESS SPACE TO START', centerX, centerY + 30);
+    ctx.fillText('PRESS Jump TO START', centerX, centerY + 30);
   }
   
   // Phase 0: Fade in/out title "GAS WARS"

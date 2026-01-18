@@ -16,8 +16,8 @@ const keys = {
 // input handlers
 document.addEventListener('keydown', (e) => {
     if(!firstInteract){
-        sounds.music.loop = true;
-        sounds.music.play();
+        sounds.intromusic.loop = true;
+        sounds.intromusic.play();
         firstInteract = true;
     }
         
