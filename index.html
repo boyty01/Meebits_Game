@@ -1,28 +1,29 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NES Game - Level Select</title>
+  <title>Meebits - Level Select</title>
   <link rel="stylesheet" href="style/main.css">
 </head>
 
 <body>
   <div class="container">
-    <h1>NES GAME</h1>
+    <h1>MEEBITS</h1>
 
-    <div class="subtitle">
-      <a href="editor.htm">Level Editor</a>
-    </div>
+ <label for="sprite-id">Player Sprite ID:</label>    
+      <input type="text" id="sprite-id" placeholder="Enter Sprite ID (optional)" title="Use your Meebit ID to play as your Meebit!" maxlength="100">
 
-    <p class="subtitle">LEVEL SELECT</p>
-
-    <div class="level-select-area">
-      <label>Choose a Level File:</label>
+      <button id="default-btn">PLAY MEEBITS</button>
       
+      <label style="text-align: center;"> ---- OR ----</label>
+    <div class="level-select-area">
+      
+     
+      <label >Choose a Level File:</label>
       <div class="file-upload-area" id="upload-area">
         <div class="file-icon">📁</div>
+        
         <div class="file-text">
           Click to browse or drag & drop<br>
           your level JSON file here
@@ -32,21 +33,23 @@
 
       <input type="file" id="file-input" accept=".json">
 
-      <label for="sprite-id">Player Sprite ID:</label>
-      <input type="text" id="sprite-id" placeholder="Enter SPRITE_ID (optional)" maxlength="100">
+      <button id="play-btn" disabled>PLAY CUSTOM LEVEL</button>
+      
 
-      <button id="play-btn" disabled>START GAME</button>
-      <button id="default-btn">PLAY DEFAULT LEVEL</button>
     </div>
 
     <div class="error-message" id="error-message"></div>
+
+    <a href="editor.htm" class="editor-button">
+      <span class="editor-icon">✨</span>
+      <span class="editor-text">MAKE YOUR OWN!</span>
+      <span class="editor-subtext">Level Editor</span>
+    </a>
 
     <div class="info-box">
       💡 TIP: Export levels from the editor and load them here to play!
     </div>
   </div>
-  <script src="js/level-list.js">
- 
-  </script>
+  <script src="js/level-list.js"></script>
 </body>
 </html>

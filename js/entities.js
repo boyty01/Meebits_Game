@@ -100,6 +100,28 @@ const ENTITY_DEFS = {
             offsetX: 3,
             offsetY: 3
         }
+    },
+
+    breakable: {
+        image: `entities/bitcoin_s.png`,
+           sprite: {
+            frameWidth: 16,
+            frameHeight: 16,
+            frames: 6,
+            row: 0
+        },
+        render: {
+            width: 16,
+            height: 16,
+            scale: 1
+        },
+        collision: {
+            width: 10,
+            height: 10,
+            offsetX: 3,
+            offsetY: 3
+        }
+
     }
 };
 
@@ -140,7 +162,7 @@ function loadAllEntities() {
             } else if (entity.type === 'breakable') {
                 gameState.breakables.push(obj);
             } else if (entity.type === "goal") {
-                gameState.goal = obj; // only one goal. editor should be updated to reflect that.
+                gameState.goal = obj; // only one goal. editor should be updated to reflect this limitation.
             }
         });
     });

@@ -60,42 +60,6 @@ function getSpriteURL(spriteId) {
   return `https://files.meebits.app/sprites/${spriteId}.png`;
 }
 
-// Update play button click handler
-playBtn.addEventListener('click', () => {
-  if (!selectedFile) {
-    showError('Please select a level file first!');
-    return;
-  }
-
-  const spriteId = spriteIdInput.value.trim();
-  const spriteURL = getSpriteURL(spriteId);
-
-  if (spriteId && !spriteURL) {
-    showError('Invalid SPRITE_ID! Only letters, numbers, -, _ allowed.');
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const levelData = JSON.parse(e.target.result);
-
-      // Store level and sprite in sessionStorage
-      sessionStorage.setItem('currentLevel', JSON.stringify(levelData));
-      sessionStorage.setItem('levelFileName', selectedFile.name);
-
-      // If valid sprite, store; otherwise null
-      sessionStorage.setItem('playerSprite', spriteURL || '');
-
-      // Redirect to play.html
-      window.location.href = 'play.html';
-    } catch (error) {
-      showError('Invalid JSON file! Please check the file format.');
-      console.error('JSON parse error:', error);
-    }
-  };
-  reader.readAsText(selectedFile);
-});
 
     // Show error message
     function showError(message) {
@@ -106,19 +70,7 @@ playBtn.addEventListener('click', () => {
     const defaultBtn = document.getElementById('default-btn');
     const spriteInput = document.getElementById('sprite-id');
 
-    // Enable play button when file is selected
-    document.getElementById('upload-area').addEventListener('click', () => document.getElementById('file-input').click());
-    document.getElementById('file-input').addEventListener('change', (e) => {
-      selectedFile = e.target.files[0];
-      if (!selectedFile.name.endsWith('.json')) {
-        showError('Please select a valid JSON file!');
-        playBtn.disabled = true;
-        return;
-      }
-      fileNameDisplay.textContent = `✓ ${selectedFile.name}`;
-      playBtn.disabled = false;
-      errorMessage.style.display = 'none';
-    });
+
 
     function showError(msg) {
       const errorMessage = document.getElementById('error-message');
