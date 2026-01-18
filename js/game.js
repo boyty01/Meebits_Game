@@ -8,7 +8,7 @@ const NES_HEIGHT_PX = 240;
 const TILE_SIZE = 16;
 const META_SIZE = 16;
 const SCALE = 3;
-const MOBILE_SPEED_MULTIPLIER = 0.3
+const MOBILE_SPEED_MULTIPLIER = 1
 
 
 // --- Game State ---
