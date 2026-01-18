@@ -12,10 +12,9 @@ const camera = {
 };
 
 function setPlayerSpawn(spawn) {
-    if(spawn && spawn.x && spawn.y)
-    {
+    if (spawn && spawn.x && spawn.y) {
         gameState.player.x = spawn.x;
-        gameState.player.y = spawn.y; 
+        gameState.player.y = spawn.y;
         return;
     }
     gameState.player.x = 32;
@@ -59,10 +58,9 @@ function updatePlayer() {
         p.animTimer++;
         if (p.animTimer >= p.animSpeed) {
             p.animTimer = 0;
-            p.animFrame = (p.animFrame + 1) % 8; // 8 frames per walk cycle in APE sprite sheet.
+            p.animFrame = (p.animFrame + 1) % 8;
         }
     } else {
-        // Idle frame
         p.animFrame = 0;
         p.animTimer = 0;
     }
@@ -79,13 +77,16 @@ function updatePlayer() {
         sounds.jump.play();
     }
 
-    // --- Gravity (only when not on ground) ---
-    if (!p.onGround) {
-        p.velocityY += p.gravity;
-    }
-
+    
     // --- Collision (NO position updates here) ---
     handleTileCollision();
+
+    // --- Gravity ---
+    p.velocityY += p.gravity;
+
+    // Cap velocityY to prevent falling through floor
+    const maxFallSpeed = 10;
+    if (p.velocityY > maxFallSpeed) p.velocityY = maxFallSpeed;
 
     // --- Apply final movement ONCE ---
     p.x += p.velocityX;
@@ -188,15 +189,19 @@ function handleTileCollision() {
                 if (localCol < 0 || localCol >= screen.collision[0].length) continue;
 
                 if (player.velocityY > 0) { // falling
-                    if (bottomRow >= 0 && bottomRow < screen.collision.length) {
+                    if (screen.collision[bottomRow] && localCol >= 0 && localCol < screen.collision[0].length) {
                         if (screen.collision[bottomRow][localCol] === true) {
-                            player.y = bottomRow * TILE_SIZE - pHeight - (collisionBox?.offsetY || 0);
+                            // Only snap if moving significantly or not already on ground
+                            if (!player.onGround || player.velocityY > 0.5) {
+                                player.y = bottomRow * TILE_SIZE - player.height;
+                            }
                             player.velocityY = 0;
                             player.onGround = true;
                             collidedY = true;
                             break;
                         }
                     }
+
                 } else if (player.velocityY < 0) { // jumping
                     if (topRow >= 0 && topRow < screen.collision.length) {
                         if (screen.collision[topRow][localCol] === true) {
@@ -405,18 +410,18 @@ function renderCollisionBoxes() {
 
     });
 
-        if (gameState.goal) {
-            const left = gameState.goal.x + (gameState.goal.def.collision?.offsetX || 0);
-            const top = gameState.goal.y + (gameState.goal.def.collision?.offsetY || 0);
-            const width = gameState.goal.def.collision?.width || gameState.goal.width;
-            const height = gameState.goal.def.collision?.height || gameState.goal.height;
+    if (gameState.goal) {
+        const left = gameState.goal.x + (gameState.goal.def.collision?.offsetX || 0);
+        const top = gameState.goal.y + (gameState.goal.def.collision?.offsetY || 0);
+        const width = gameState.goal.def.collision?.width || gameState.goal.width;
+        const height = gameState.goal.def.collision?.height || gameState.goal.height;
 
-            ctx.strokeRect(
-                left - gameState.cameraX,
-                top - gameState.cameraY,
-                width,
-                height
-            );
+        ctx.strokeRect(
+            left - gameState.cameraX,
+            top - gameState.cameraY,
+            width,
+            height
+        );
 
-        }
+    }
 }

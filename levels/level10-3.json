@@ -1,5 +1,5 @@
 {
-  "mode": "meta",
+  "mode": "collision",
   "gridDimensions": {
     "cols": 16,
     "rows": 15
@@ -162,28 +162,10 @@
           238,
           238,
           238,
-          238,
-          59,
-          59,
-          59,
-          238,
-          238,
-          238
-        ],
-        [
-          238,
-          238,
-          238,
-          238,
-          238,
-          238,
-          238,
-          238,
-          238,
-          238,
-          238,
-          238,
-          238,
+          151,
+          151,
+          151,
+          151,
           238,
           238,
           238
@@ -196,6 +178,24 @@
           238,
           238,
           238,
+          238,
+          238,
+          238,
+          238,
+          238,
+          238,
+          238,
+          238,
+          238
+        ],
+        [
+          238,
+          238,
+          238,
+          151,
+          151,
+          151,
+          151,
           238,
           238,
           238,
@@ -434,7 +434,7 @@
           false,
           false,
           false,
-          false,
+          true,
           true,
           true,
           true,
@@ -464,10 +464,10 @@
           true,
           false,
           false,
-          false,
-          false,
-          false,
-          false,
+          true,
+          true,
+          true,
+          true,
           false,
           false,
           false,
@@ -574,6 +574,36 @@
           "type": "spawn",
           "col": 2,
           "row": 13,
+          "properties": {}
+        },
+        {
+          "type": "collectible",
+          "col": 9,
+          "row": 6,
+          "properties": {}
+        },
+        {
+          "type": "collectible",
+          "col": 3,
+          "row": 8,
+          "properties": {}
+        },
+        {
+          "type": "collectible",
+          "col": 4,
+          "row": 8,
+          "properties": {}
+        },
+        {
+          "type": "collectible",
+          "col": 5,
+          "row": 8,
+          "properties": {}
+        },
+        {
+          "type": "collectible",
+          "col": 6,
+          "row": 8,
           "properties": {}
         }
       ]
@@ -1361,8 +1391,8 @@
           238,
           238,
           238,
-          238,
-          238,
+          151,
+          151,
           109,
           110,
           105,
@@ -1633,8 +1663,8 @@
           false,
           false,
           false,
-          false,
-          false,
+          true,
+          true,
           true,
           false,
           false,
